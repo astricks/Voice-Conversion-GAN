@@ -18,8 +18,6 @@ class CycleGANTraining:
                  coded_sps_A_norm,
                  coded_sps_B_norm,
                  model_checkpoint,
-                 validation_A_dir,
-                 output_A_dir,
                  validation_B_dir,
                  output_B_dir,
                  restart_training_at=None):
@@ -79,8 +77,6 @@ class CycleGANTraining:
         self.modelCheckpoint = model_checkpoint
 
         # Validation set Parameters
-        self.validation_A_dir = validation_A_dir
-        self.output_A_dir = output_A_dir
         self.validation_B_dir = validation_B_dir
         self.output_B_dir = output_B_dir
 
@@ -97,12 +93,12 @@ class CycleGANTraining:
         sampling_rate = 16000
         frame_period = 5.0
         n_frames = 128
-        validation_B_dir = self.validation_B_dir
+        inference_input_dir = self.validation_B_dir
         output_B_dir = self.output_B_dir
 
-        print("Generating Validation Data A from B...")
-        for file in os.listdir(validation_B_dir):
-            filePath = os.path.join(validation_B_dir, file)
+        print("Applying model to files for inference...")
+        for file in os.listdir(inference_input_dir):
+            filePath = os.path.join(inference_input_dir, file)
             wav, _ = librosa.load(filePath, sr=sampling_rate, mono=True)
             wav = preprocess.wav_padding(wav=wav,
                                          sr=sampling_rate,
@@ -198,10 +194,6 @@ if __name__ == '__main__':
     parser.add_argument('--resume_training_at', type=str,
                         help="Location of the pre-trained model to resume training",
                         default=resume_training_at)
-    parser.add_argument('--validation_A_dir', type=str,
-                        help="validation set for sound source A", default=validation_A_dir_default)
-    parser.add_argument('--output_A_dir', type=str,
-                        help="output for converted Sound Source A", default=output_A_dir_default)
     parser.add_argument('--validation_B_dir', type=str,
                         help="Validation set for sound source B", default=validation_B_dir_default)
     parser.add_argument('--output_B_dir', type=str,
@@ -216,8 +208,6 @@ if __name__ == '__main__':
     model_checkpoint = argv.model_checkpoint
     resume_training_at = argv.resume_training_at
 
-    validation_A_dir = argv.validation_A_dir
-    output_A_dir = argv.output_A_dir
     validation_B_dir = argv.validation_B_dir
     output_B_dir = argv.output_B_dir
 
@@ -231,8 +221,6 @@ if __name__ == '__main__':
                                 coded_sps_A_norm=coded_sps_A_norm,
                                 coded_sps_B_norm=coded_sps_B_norm,
                                 model_checkpoint=model_checkpoint,
-                                validation_A_dir=validation_A_dir,
-                                output_A_dir=output_A_dir,
                                 validation_B_dir=validation_B_dir,
                                 output_B_dir=output_B_dir,
                                 restart_training_at=resume_training_at)
